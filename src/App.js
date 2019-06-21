@@ -4,59 +4,73 @@ import './App.css';
 import MyInput from './MiComponente'
 import NumberList from './List'
 
+
+import { connect } from 'react-redux';
+import store from './store/store'
+
+function mapStateToProps(state){
+  return {
+    state: state
+  }
+}
+
 class App extends React.Component {
   constructor(props){
     super(props);
-    this.onButtonClick = this.onButtonClick.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
     this.state = {
-      temperatura : 45,
-      nombres:[
-        "Andrés",
-        "Adrián",
-        "Adriana"
-      ],
-      NumberList:[1, 2, 3, 4, 5]
+      users: this.props.state.users,
+      token: this.props.state.token
     }
   }
 
-  onButtonClick(e){
-    this.state.NumberList.push(56);
-  }
-
-  handleChange(temp){    
-    this.setState({temperatura: temp})
+  async handleClick(){    
+    let nuevo = {
+      nombre: document.getElementById("txt_nombre").value,
+      apellido: document.getElementById("txt_apellido").value
+    };
+    await this.props.dispatch({
+      type: "ADD_USER",
+      payload: {
+        user: nuevo
+      }
+    });
+    this.setState({users: this.props.state.users})
   }
 
   render(){
-    const listItems = this.state.NumberList.map((number) =>
-      <li key={number.toString()}>{number}</li>
+    const listItems = this.state.users.map((persona, index) =>
+      <li key={index}>{persona.nombre + " " + persona.apellido}</li>
     ); 
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <button onClick={this.onButtonClick}>Acción</button>
-          <MyInput temp={this.state.temperatura} onChange={this.handleChange} />
-          <ul>{
-            this.state.NumberList.map((item)=><li key={item.toString()}>{item}</li>)
-          }</ul>
-        </header>
-      </div>
+      <div style={{display: "flex", flexDirection:"column", padding:"10%"}}>             
+        <ul>
+          {listItems}
+        </ul>
+        <input type="text" id="txt_nombre"/>
+        <input type="text" id="txt_apellido"/>
+        <button onClick={this.handleClick}>Agregar</button>
+        <p>{this.props.state.token}</p>
+        <input 
+          type="text" 
+          id="txt_token" 
+          value={this.props.state.token}
+          onChange={async (e)=>
+            {       
+              await this.props.dispatch({
+                type:"SET_TOKEN",
+                payload: {
+                  token: e.target.value
+                }
+              });
+              this.setState({token:this.props.state.token});
+            }
+          }
+        />
+      </div>    
     );    
   }
 
 }
 
-export default App;
+export default connect(mapStateToProps)(App);
