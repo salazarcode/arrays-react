@@ -1,10 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import MyInput from './MiComponente'
-import NumberList from './List'
-
-
 import { connect } from 'react-redux';
 import store from './store/store'
 
